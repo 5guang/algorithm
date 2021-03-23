@@ -7,7 +7,31 @@ class ListNode {
 
 class SingleLinkedList {
   constructor(val) {
-    this.head = new ListNode(val);
+    this.head = this.#newNode(val);
+    this.length = 1;
+  }
+  #newNode(val) {
+    return new ListNode(val);
+  }
+  #increaseLength() {
+    this.length += 1;
+  }
+  #decreaseLength() {
+    if (this.length > 0) {
+      this.length -= 1;
+    }
+  }
+
+  #insert(curr, newVal) {
+    if (curr.next === null) {
+      this.append(newVal);
+      return;
+    }
+    const node = new ListNode(newVal);
+    const nextNode = curr.next;
+    node.next = nextNode;
+    curr.next = node;
+    this.#increaseLength();
   }
 
   find(val) {
@@ -19,6 +43,23 @@ class SingleLinkedList {
         curr = null;
     }
     return curr;
+  }
+  findByPosition(position) {
+    if (position < 1) return null;
+    if (position === 1) {
+      return this.head;
+    }
+    let count = 2;
+    let head = this.head;
+    while (head && count !== position) {
+      if (head.next) {
+        head = head.next;
+        count += 1;
+      } else {
+        return null;
+      }
+    }
+    return head;
   }
 
   findLast() {
@@ -39,21 +80,20 @@ class SingleLinkedList {
   }
 
   append(val) {
-    const node = new ListNode(val);
+    const node = this.#newNode(val);
     const lastNode = this.findLast();
     lastNode.next = node;
+    this.#increaseLength();
   }
 
-  insert(val, newVal) {
+  insertByPosition(position, newVal) {
+    const curr = this.findByPosition(position);
+    this.#insert(curr, newVal);
+  }
+
+  insertByValue(val, newVal) {
     const curr = this.find(val);
-    if (curr.next === null) {
-      this.append(val);
-      return;
-    }
-    const node = new ListNode(newVal);
-    const nextNode = curr.next;
-    node.next = nextNode;
-    curr.next = node;
+    this.#insert(curr, newVal);
   }
 
   del(val) {
@@ -63,18 +103,24 @@ class SingleLinkedList {
     if (curr === this.head) {
       const head = curr.next;
       this.head = head;
-      return true;
+    } else {
+      const next = curr.next;
+      prev.next = next;
     }
-    const next = curr.next;
-    prev.next = next;
+
+    this.#decreaseLength()
     return true;
-    
+
   }
 }
 
 const linkedList = new SingleLinkedList(1);
 linkedList.append(2);
 linkedList.append(4);
-linkedList.insert(2, 3);
-linkedList.del(4);
+linkedList.append(6);
+linkedList.insertByValue(2, 3);
+linkedList.insertByPosition(4, 5);
+// linkedList.del(4);
+// const ele = linkedList.findByPosition(10);
 console.log(linkedList.head);
+// console.log(ele);
